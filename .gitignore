@@ -4,3 +4,4 @@ node_modules/
 !.env.example
 
 markexa-backend-5d17abcc30cb.json
+node_modules/
