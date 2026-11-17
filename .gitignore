@@ -1,0 +1,6 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+markexa-backend-5d17abcc30cb.json
