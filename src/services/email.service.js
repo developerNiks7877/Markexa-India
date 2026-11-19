@@ -1,4 +1,3 @@
-
 const sendEmail = async ({ to, subject, textContent }) => {
   const response = await fetch(
     "https://api.brevo.com/v3/smtp/email",
@@ -33,7 +32,7 @@ const sendEmail = async ({ to, subject, textContent }) => {
 };
 
 
-// Convert service values into readable names
+
 const serviceLabels = {
   "brand-identity": "Brand Identity",
   "web-design-development": "Web Design & Development",
@@ -45,7 +44,7 @@ const serviceLabels = {
 };
 
 
-// Convert budget values into readable names
+
 const budgetLabels = {
   "prefer-not-to-say": "Prefer not to say",
   "under-1-lakh": "Under ₹1 lakh",

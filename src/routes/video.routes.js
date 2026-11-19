@@ -24,15 +24,14 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   limits: {
-    fileSize: 50 * 1024 * 1024
+    fileSize: 200 * 1024 * 1024
   },
   fileFilter
 });
 
-// POST - Upload video
 router.post("/", upload.single("file"), createVideo);
 
-// GET - Fetch videos
+
 router.get("/", getVideos);
 
 module.exports = router;

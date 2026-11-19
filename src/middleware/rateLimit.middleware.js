@@ -1,13 +1,14 @@
-
 const rateLimit = require("express-rate-limit");
 
 const enquiryLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 5,
+    limit: "15",
+
     message: {
         success: false,
         message: "Too many enquiries. Please try again after 15 minutes."
     },
+
     standardHeaders: true,
     legacyHeaders: false
 });

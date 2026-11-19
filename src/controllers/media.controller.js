@@ -44,11 +44,12 @@ const uploadMedia = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Media upload error:", error.message);
+        console.error("Create video error:", error);
 
         return res.status(500).json({
             success: false,
-            message: "Media upload failed"
+            message: "Failed to upload and save video",
+            error: error.message
         });
     }
 };
