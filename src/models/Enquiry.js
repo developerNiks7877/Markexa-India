@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const enquirySchema = new mongoose.Schema(
@@ -5,20 +6,27 @@ const enquirySchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      minlength: 2,
+      maxlength: 80
     },
 
     email: {
       type: String,
       required: true,
       lowercase: true,
-      trim: true
+      trim: true,
+      match: [
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        "Please enter a valid email"
+      ]
     },
 
     company: {
       type: String,
       trim: true,
-      default: ""
+      default: "",
+      maxlength: 100
     },
 
     services: {
@@ -39,7 +47,7 @@ const enquirySchema = new mongoose.Schema(
       required: true,
       validate: {
         validator: function (value) {
-          return value.length > 0;
+          return Array.isArray(value) && value.length > 0;
         },
         message: "At least one service must be selected"
       }
@@ -61,13 +69,16 @@ const enquirySchema = new mongoose.Schema(
     message: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      minlength: 10,
+      maxlength: 2000
     },
 
     timeline: {
       type: String,
       trim: true,
-      default: ""
+      default: "",
+      maxlength: 50
     },
 
     status: {
@@ -79,7 +90,8 @@ const enquirySchema = new mongoose.Schema(
     adminNotes: {
       type: String,
       trim: true,
-      default: ""
+      default: "",
+      maxlength: 2000
     },
 
     emailStatus: {

@@ -1,3 +1,4 @@
+
 const TeamMember = require("../models/TeamMember");
 
 // POST - Add Team Member
@@ -5,18 +6,42 @@ const createTeamMember = async (req, res) => {
   try {
     const { name, designation, imageUrl, description } = req.body;
 
-    if (!name || !designation) {
+    // Check required fields
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      typeof designation !== "string" ||
+      !designation.trim()
+    ) {
       return res.status(400).json({
         success: false,
         message: "Name and designation are required"
       });
     }
 
+    // Validate image URL if provided
+    if (imageUrl) {
+      try {
+        const parsedUrl = new URL(imageUrl);
+
+        if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+          throw new Error("Invalid protocol");
+        }
+      } catch {
+        return res.status(400).json({
+          success: false,
+          message: "Please provide a valid image URL"
+        });
+      }
+    }
+
     const teamMember = await TeamMember.create({
-      name,
-      designation,
-      imageUrl,
-      description
+      name: name.trim(),
+      designation: designation.trim(),
+      imageUrl: imageUrl?.trim() || "",
+      description: typeof description === "string"
+        ? description.trim()
+        : ""
     });
 
     return res.status(201).json({

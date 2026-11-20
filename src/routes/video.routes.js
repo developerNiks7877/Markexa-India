@@ -1,13 +1,9 @@
-
 const express = require("express");
 const multer = require("multer");
 
 const router = express.Router();
 
-const {
-  createVideo,
-  getVideos
-} = require("../controllers/video.controller");
+const { createVideo, getVideos } = require("../controllers/video.controller");
 
 // Store video temporarily in memory
 const storage = multer.memoryStorage();
@@ -24,13 +20,12 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   limits: {
-    fileSize: 200 * 1024 * 1024
+    fileSize: 200 * 1024 * 1024,
   },
-  fileFilter
+  fileFilter,
 });
 
 router.post("/", upload.single("file"), createVideo);
-
 
 router.get("/", getVideos);
 

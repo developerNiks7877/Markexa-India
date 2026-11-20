@@ -5,17 +5,45 @@ const createPhotoLink = async (req, res) => {
   try {
     const { title, linkUrl, description } = req.body;
 
-    if (!title || !linkUrl) {
+    // Check required fields
+    if (
+      typeof title !== "string" ||
+      !title.trim() ||
+      typeof linkUrl !== "string" ||
+      !linkUrl.trim()
+    ) {
       return res.status(400).json({
         success: false,
         message: "Title and link URL are required"
       });
     }
 
+    // Validate URL
+    let parsedUrl;
+
+    try {
+      parsedUrl = new URL(linkUrl.trim());
+    } catch {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid URL"
+      });
+    }
+
+    // Allow only HTTP and HTTPS
+    if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+      return res.status(400).json({
+        success: false,
+        message: "Only HTTP and HTTPS URLs are allowed"
+      });
+    }
+
     const photoLink = await PhotoLink.create({
-      title,
-      linkUrl,
-      description
+      title: title.trim(),
+      linkUrl: linkUrl.trim(),
+      description: typeof description === "string"
+        ? description.trim()
+        : ""
     });
 
     return res.status(201).json({

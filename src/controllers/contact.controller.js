@@ -1,3 +1,4 @@
+
 const Enquiry = require("../models/Enquiry");
 const contactSchema = require("../validators/contact.validator");
 
@@ -25,37 +26,34 @@ const createContact = async (req, res) => {
 
     // Save enquiry in MongoDB
     const enquiry = await Enquiry.create(result.data);
-    console.log("SAVED DATABASE:", Enquiry.db.name);
-    console.log("SAVED COLLECTION:", Enquiry.collection.name);
-    console.log("SAVED ID:", enquiry._id);
-    //  Append enquiry to Google Sheets
+
+    // Append enquiry to Google Sheets
     let googleSheetStatus = "failed";
 
     try {
       await appendEnquiryToGoogleSheet(enquiry);
       googleSheetStatus = "sent";
-    } catch (sheetError) {
-      console.error("Google Sheets integration failed:", sheetError.message);
+    } catch (error) {
+      console.error("Google Sheets error:", error.message);
     }
 
-    //Send email notifications
+    // Send email notifications
     const emailResults = await Promise.allSettled([
       sendAdminNotification(enquiry),
       sendUserConfirmation(enquiry),
     ]);
 
-    const bothEmailsSent = emailResults.every(
-      (result) => result.status === "fulfilled",
-    );
+    // Check email status
+    const emailStatus = emailResults.every(
+      (result) => result.status === "fulfilled"
+    ) ? "sent" : "failed";
 
-    const emailStatus = bothEmailsSent ? "sent" : "failed";
-
-    //Update email status in MongoDB
+    // Update email status in MongoDB
     try {
       await Enquiry.findByIdAndUpdate(
         enquiry._id,
         { emailStatus },
-        { runValidators: true },
+        { runValidators: true }
       );
     } catch (updateError) {
       console.error("Email status update failed:", updateError.message);
@@ -68,12 +66,12 @@ const createContact = async (req, res) => {
           index === 0
             ? "Admin email failed:"
             : "User confirmation email failed:",
-          result.reason?.message || result.reason,
+          result.reason?.message || result.reason
         );
       }
     });
 
-    //Send API response
+    // Respond to the client
     return res.status(201).json({
       success: true,
       message: "Enquiry submitted successfully",
@@ -81,6 +79,7 @@ const createContact = async (req, res) => {
       emailStatus,
       googleSheetStatus,
     });
+
   } catch (error) {
     console.error("Create enquiry error:", error.message);
 
