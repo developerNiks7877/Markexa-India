@@ -1,0 +1,221 @@
+/* ChromaGrid — spotlight colour reveal grid. All tuning arrives as --cg-* custom properties from the component. */
+.cg-root {
+  --cg-bg: #0a0a0a;
+  --cg-fg: #f4f4f1;
+  --cg-line: rgba(255, 255, 255, .1);
+  --cg-shade: rgba(0, 0, 0, .86);
+  --cg-muted: rgba(244, 244, 241, .68);
+  position: relative;
+  width: 100%;
+}
+
+.cg-root[data-theme="light"] {
+  --cg-bg: #ecece8;
+  --cg-fg: #0b0b0b;
+  --cg-line: rgba(0, 0, 0, .12);
+  --cg-shade: rgba(236, 236, 232, .94);
+  --cg-muted: rgba(11, 11, 11, .66);
+}
+
+.cg-root[data-frame="true"] {
+  padding: 14px;
+  border: 1px solid var(--cg-line);
+  border-radius: calc(var(--cg-radius) + 14px);
+}
+
+.cg-grid {
+  --x: 50%;
+  --y: 50%;
+  --o: 0;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  gap: var(--cg-gap);
+  grid-template-columns: repeat(auto-fill, minmax(max(var(--cg-min), calc((100% - (var(--cg-cols) - 1) * var(--cg-gap)) / var(--cg-cols))), 1fr));
+}
+
+.cg-card {
+  position: relative;
+  display: block;
+  aspect-ratio: var(--cg-ar);
+  border-radius: var(--cg-radius);
+  overflow: hidden;
+  background: var(--cg-bg);
+  border: 1px solid var(--cg-line);
+  color: var(--cg-fg);
+  text-decoration: none;
+  transition: box-shadow .45s, border-color .45s;
+  animation: cg-in .7s ease backwards;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+@keyframes cg-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.cg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .9s cubic-bezier(.2, .8, .2, 1), filter .5s;
+  user-select: none;
+}
+
+.cg-card:hover .cg-img,
+.cg-card:focus-visible .cg-img {
+  transform: scale(1.045);
+}
+
+.cg-shade {
+  position: absolute;
+  inset: 40% 0 0 0;
+  background: linear-gradient(transparent, var(--cg-shade));
+}
+
+/* spotlight: one overlay desaturates everything except the area around the cursor */
+.cg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  -webkit-backdrop-filter: grayscale(var(--cg-gs)) brightness(calc(1 - var(--cg-dim)));
+  backdrop-filter: grayscale(var(--cg-gs)) brightness(calc(1 - var(--cg-dim)));
+  -webkit-mask-image: radial-gradient(circle var(--cg-r) at var(--x) var(--y), rgb(0 0 0 / calc(1 - var(--o))) 0%, rgb(0 0 0 / calc(1 - var(--o))) var(--cg-inner), #000 100%);
+  mask-image: radial-gradient(circle var(--cg-r) at var(--x) var(--y), rgb(0 0 0 / calc(1 - var(--o))) 0%, rgb(0 0 0 / calc(1 - var(--o))) var(--cg-inner), #000 100%);
+}
+
+@media (hover: none) {
+  .cg-overlay {
+    display: none;
+  }
+}
+
+/* hover mode: per-card reveal */
+.cg-root[data-reveal="hover"] .cg-img {
+  filter: grayscale(var(--cg-gs)) brightness(calc(1 - var(--cg-dim)));
+}
+
+.cg-root[data-reveal="hover"] .cg-card:hover .cg-img,
+.cg-root[data-reveal="hover"] .cg-card:focus-visible .cg-img {
+  filter: none;
+}
+
+@media (hover: none) {
+  .cg-root[data-reveal="hover"] .cg-img {
+    filter: none;
+  }
+}
+
+/* accent border glow follows the pointer inside the hovered card */
+.cg-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 4;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .35s;
+  background: radial-gradient(circle 260px at var(--mx, 50%) var(--my, 50%), var(--accent), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.cg-card:hover::before,
+.cg-card:focus-visible::before {
+  opacity: var(--cg-bg-glow);
+}
+
+.cg-card:focus-visible::before {
+  background: var(--accent);
+}
+
+.cg-card:hover,
+.cg-card:focus-visible {
+  box-shadow: 0 20px 60px -24px color-mix(in srgb, var(--accent) var(--cg-glow), transparent);
+  border-color: transparent;
+}
+
+.cg-card:focus-visible {
+  outline: none;
+}
+
+.cg-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px 17px;
+  pointer-events: none;
+}
+
+.cg-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: .78rem;
+  color: var(--cg-muted);
+}
+
+.cg-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--cg-fg);
+}
+
+.cg-cat i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.cg-title {
+  margin: 0;
+  font-family: var(--serif, Georgia, serif);
+  font-weight: 400;
+  font-size: clamp(1.3rem, 1.7vw, 1.7rem);
+  line-height: 1.06;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+
+.cg-desc {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .45s cubic-bezier(.2, .8, .2, 1);
+}
+
+.cg-desc>span {
+  overflow: hidden;
+  font-size: .84rem;
+  line-height: 1.4;
+  color: var(--cg-muted);
+}
+
+@media (hover: hover) {
+
+  .cg-card:hover .cg-desc,
+  .cg-card:focus-visible .cg-desc {
+    grid-template-rows: 1fr;
+  }
+
+  .cg-card:hover .cg-desc>span {
+    padding-top: 4px;
+  }
+}
+.cg-overlay {
+  display: none !important;
+}
