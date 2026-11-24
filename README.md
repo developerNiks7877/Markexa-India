@@ -31,10 +31,9 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy frontend to Render
 
-This repository includes a `render.yaml` Blueprint for deploying the frontend as a Node web service. In Render, create a **Blueprint** from this repository and deploy `markexaindia-frontend`. Do not deploy it as a static site: the contact form uses the app's `/api/contact` route.
+This repository includes a `render.yaml` Blueprint for deploying the frontend as a **Static Site**. In Render, create a Blueprint from this repository, or use these settings:
 
-The site works without deploying the separate backend. Backend-powered photos, videos, and portfolio links are skipped unless `NEXT_PUBLIC_API_URL` is configured. The contact form runs in demo mode until these optional Render environment variables are set:
+- Build command: `npm ci && npm run build`
+- Publish directory: `out`
 
-- `RESEND_API_KEY`
-- `CONTACT_TO_EMAIL`
-- `CONTACT_FROM_EMAIL` (a verified Resend sender)
+The website has no backend or API dependency. Contact form submission opens the visitor's email app with a prepared draft; the visitor sends it from there.

@@ -13,8 +13,7 @@ Run: `npm install && npm run dev` (http://localhost:3000)
 | Partner logos | `data/services.ts` → `partners` (slots only, no invented partners) |
 
 ## Contact form
-`/api/contact` validates server-side. Without env vars it runs in **demo mode** (nothing is sent; UI says so).
-Copy `.env.example` to `.env.local` and set `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL` to send real mail via Resend.
+The frontend validates the form and opens the visitor's email app with a prepared message. No backend, API keys, or environment variables are required; the visitor sends the email from their mail app.
 
 ## Notes
 - No new animation/3D dependencies. Added only two font packages: `@fontsource/instrument-serif`, `@fontsource-variable/schibsted-grotesk` (self-hosted).

@@ -6,14 +6,13 @@ import MagneticButton from "./effects/MagneticButton";
 import { services } from "@/data/services";
 import { site } from "@/data/site";
 import SocialLinks from "@/components/SocialLinks";
-import {submitContact} from "@/lib/api/contact";
 type FormErrors = {
   name?: string;
   email?: string;
   service?: string;
   message?: string;
 };
-type FormState = "idle" | "loading" | "done" | "demo" | "fail";
+type FormState = "idle" | "done" | "fail";
 
 
 const budgets = [
@@ -84,6 +83,7 @@ export default function Contact() {
 
   // Store the current form state
   const [state, setState] = useState<FormState>("idle");
+  const [mailLink, setMailLink] = useState("");
 
 
   // 8. Mouse-following glow effect
@@ -109,7 +109,7 @@ export default function Contact() {
 
 
   // 9. Handle form submission
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
 
     // Stop the browser from reloading the page
     e.preventDefault();
@@ -127,7 +127,6 @@ export default function Contact() {
     const service = String(formData.get("service") ?? "");
     const budget = String(formData.get("budget") ?? "");
     const message = String(formData.get("message") ?? "");
-    const website = String(formData.get("website") ?? "");
 
 
     // 10. Validate the form
@@ -179,95 +178,26 @@ export default function Contact() {
     }
 
 
-    // 11. Change the form state to loading
-    setState("loading");
+    if (!site.email) {
+      setState("fail");
+      return;
+    }
 
+    const subject = encodeURIComponent(`New enquiry from ${name.trim()}`);
+    const body = encodeURIComponent(
+      [
+        `Name: ${name.trim()}`,
+        `Email: ${email.trim()}`,
+        `Company: ${company.trim()}`,
+        `Service: ${service}`,
+        `Budget: ${budget || "Not specified"}`,
+        "",
+        message.trim(),
+      ].join("\n"),
+    );
 
-    // 12. Send the form information to the backend
-      try {
-  const responseData = await submitContact({
-    name: name.trim(),
-    email: email.trim(),
-    company: company.trim(),
-    service,
-    budget,
-    message: message.trim(),
-    website,
-  });
-
-  if (responseData.demo) {
-    setState("demo");
-  } else {
+    setMailLink(`mailto:${site.email}?subject=${subject}&body=${body}`);
     setState("done");
-  }
-
-} catch (error) {
-  console.error("Contact form error:", error);
-  setState("fail");
-}
-    //   try {
-
-  //     // Send a POST request to the contact API
-  //     const response = await fetch("/api/contact", {
-
-  //       method: "POST",
-
-  //       headers: {
-  //         "Content-Type": "application/json"
-  //       },
-
-  //       // Convert our form information into JSON
-  //       body: JSON.stringify({
-  //         name: name.trim(),
-  //         email: email.trim(),
-  //         company: company.trim(),
-  //         service,
-  //         budget,
-  //         message: message.trim(),
-  //         website
-  //       })
-
-  //     });
-
-
-  //     // Read the response sent by the server
-  //     const responseData = await response.json();
-
-
-  //     // 13. Handle server-side validation errors
-  //     if (response.status === 422 && responseData.errors) {
-
-  //       setErrors(responseData.errors);
-
-  //       setState("idle");
-
-  //       return;
-  //     }
-
-
-  //     // 14. Check whether the request was successful
-  //     if (!response.ok || !responseData.ok) {
-  //       throw new Error("Something went wrong.");
-  //     }
-
-
-  //     // 15. Display the appropriate success state
-  //     if (responseData.demo) {
-  //       setState("demo");
-  //     }
-  //     else {
-  //       setState("done");
-  //     }
-
-  //   }
-
-  //   // 16. Handle unexpected errors
-  //   catch (error) {
-
-  //     console.error("Contact form error:", error);
-
-  //     setState("fail");
-  //   }
   }
 
 
@@ -356,32 +286,30 @@ export default function Contact() {
           className="form"
           onSubmit={handleSubmit}
           noValidate
-          aria-busy={state === "loading"}
         >
 
 
           {/* 20. SUCCESS AND DEMO MESSAGES */}
 
-          {state === "done" || state === "demo" ? (
+          {state === "done" ? (
 
             <div className="form__done" role="status">
 
-              <h3>
-                {state === "demo"
-                  ? "Demo mode: message not sent."
-                  : "Message sent."}
-              </h3>
+              <h3>Email draft ready.</h3>
 
               <p>
-                {state === "demo"
-                  ? "Your details passed validation, but no email service is configured yet. Add the Resend keys from .env.example to send real messages."
-                  : "Thank you. We'll get back to you soon."}
+                Open your email app with the prepared message, then review and send it.
               </p>
+
+              <a className="link" href={mailLink}>Open email draft</a>
 
               <button
                 type="button"
                 className="link"
-                onClick={() => setState("idle")}
+                onClick={() => {
+                  setMailLink("");
+                  setState("idle");
+                }}
               >
                 Send another
               </button>
@@ -470,16 +398,6 @@ export default function Contact() {
                 />
 
               </div>
-
-
-              {/* HONEYPOT SPAM PROTECTION */}
-              <input
-                name="website"
-                tabIndex={-1}
-                autoComplete="off"
-                className="hp"
-                aria-hidden="true"
-              />
 
 
               {/* SERVICE AND BUDGET */}
@@ -594,7 +512,7 @@ export default function Contact() {
               {/* GENERAL SUBMISSION ERROR */}
               {state === "fail" && (
                 <p className="form__fail" role="alert">
-                  Something went wrong sending that. Please try again.
+                  The contact email is not configured. Please email us directly using the address on this page.
                 </p>
               )}
 
@@ -603,12 +521,9 @@ export default function Contact() {
               <MagneticButton
                 type="submit"
                 className="btn--solid"
-                disabled={state === "loading"}
               >
 
-                {state === "loading"
-                  ? "Sending…"
-                  : "Send message"}
+                Send message
 
               </MagneticButton>
 

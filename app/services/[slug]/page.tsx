@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ServiceDetail from "@/components/services/ServiceDetail";
 import { services } from "@/data/services";
-import { getPhotosByService } from "@/lib/api/photos";
 
 export const dynamicParams = false;
 
@@ -34,7 +33,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 //   if (!s) notFound();
 
 //   // Fetch only photos belonging to this service
-//   const photos = await getPhotosByService(slug);
 
 //   console.log(`Photos for ${slug}:`, photos);
 
@@ -48,11 +46,5 @@ export default async function ServicePage({ params }: Props) {
 
   if (!s) notFound();
 
-  // Load photos, but don't let an API failure crash the page
-  const photos = await getPhotosByService(slug).catch((error) => {
-    console.error(`Failed to load photos for ${slug}:`, error);
-    return [];
-  });
-
-  return <ServiceDetail service={s} photos={photos} />;
+  return <ServiceDetail service={s} />;
 }

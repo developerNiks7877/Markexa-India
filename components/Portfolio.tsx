@@ -4,15 +4,12 @@ import Image from "next/image";
 import ProceduralArt from "./effects/ProceduralArt";
 import { projects } from "@/data/projects";
 import { media } from "@/data/media";
-import { getPhotoLinks } from "@/lib/api/photo-links";
-import type { PhotoLink } from "@/lib/api/photo-links";
 const N = projects.length;
 const STEP = 360 / N;
 
 
 /** Circular, draggable 3D carousel: pointer drag + momentum + snapping, keyboard arrows, click to select. */
 export default function Portfolio() {
-  const [photoLinks, setPhotoLinks] = useState<PhotoLink[]>([]);
   const isPaused = useRef(false);
   const isManuallySelected = useRef(false);
   const ring = useRef<HTMLDivElement>(null);
@@ -27,28 +24,6 @@ export default function Portfolio() {
     const idx = ((Math.round(-s.rot / STEP) % N) + N) % N;
     setActive((a) => (a === idx ? a : idx));
   }, []);
-  useEffect(() => {
-  let mounted = true;
-
-  const fetchLinks = async () => {
-    try {
-      const links = await getPhotoLinks();
-
-      if (mounted) {
-        setPhotoLinks(links);
-      }
-    } catch (error) {
-      console.error("Photo links API error:", error);
-    }
-  };
-
-  fetchLinks();
-
-  return () => {
-    mounted = false;
-  };
-}, []);
-
   const loop = useCallback(() => {
     const s = st.current;
     s.rot += (s.target - s.rot) * 0.12;
@@ -103,24 +78,9 @@ useEffect(() => {
     if (e.key === "ArrowLeft") { e.preventDefault(); step(-1); }
   };
   const handleProjectClick = (i: number) => {
-  isManuallySelected.current = true;
-
-  const project = projects[i];
-
-  const photoLink = photoLinks.find(
-    (link) =>
-      link.title.trim().toLowerCase() ===
-      project.name.trim().toLowerCase()
-  );
-
-  if (photoLink?.linkUrl) {
-    window.location.assign(photoLink.linkUrl);
-    return;
-  }
-
-  // No link available yet: select the project normally.
-  goTo(i);
-};
+    isManuallySelected.current = true;
+    goTo(i);
+  };
   const p = projects[active];
   return (
     <div className="work__gallery">

@@ -1,8 +1,5 @@
 services:
-  - type: web
+  - type: static
     name: markexaindia-frontend
-    runtime: node
-    plan: free
     buildCommand: npm ci && npm run build
-    startCommand: npm run start
-    healthCheckPath: /
+    staticPublishPath: ./out

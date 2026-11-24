@@ -5,77 +5,18 @@ import WorkShowcase from "./WorkShowcase";
 import { services } from "@/data/services";
 import type { Service } from "@/data/services";
 import { servicePages } from "@/data/service-pages";
-import { getWork,type WorkItem } from "@/data/work";
-import { getVideos } from "@/lib/api/videos";
-import type { Photo } from "@/lib/api/photos";
+import { getWork } from "@/data/work";
 
 
 type Props = {
   service: Service;
-  photos: Photo[];
 };
 
-export default async function ServiceDetail({ service, photos }: Props) {
+export default function ServiceDetail({ service }: Props) {
   const page = servicePages[service.id];
 
-  const servicePhotos = photos.filter((photo) => photo.isActive && photo.imageUrl);
-  
-
-  // Debug logs
-  console.log("Current service ID:", service.id);
-
-  console.table(
-    photos.map((photo) => ({
-      title: photo.title,
-      section: photo.section,
-      imageUrl: photo.imageUrl,
-      isActive: photo.isActive,
-    }))
-  );
-
-  console.log("Filtered photos:", servicePhotos);
-
-  // Fetch videos only for the Video Editing service
-  const apiVideos = service.id === "motion"
-    ? await getVideos().catch((error) => {
-        console.error("Could not load portfolio videos:", error);
-        return [];
-      })
-    : [];
-
-
-  // Convert API videos into your existing WorkItem format
-  const videoWork: WorkItem[] = apiVideos.map((video) => ({
-    id: video._id,
-    name: video.title,
-    serviceId: "motion",
-    category: "Video",
-    type: "video",
-    description: video.description ?? "",
-    image: video.thumbnailUrl,
-    videoUrl: video.videoUrl,
-  }));
-
-  // Convert API photos into existing WorkItem format
-const photoWork: WorkItem[] = servicePhotos.map((photo) => ({
-  id: photo._id,
-  name: photo.title,
-  serviceId: service.id,
-  category: "Portfolio",
-  type: "campaign",
-  description: photo.description ?? "",
-  image: photo.imageUrl,
-}));
-
-// Combine API photos, videos and existing portfolio work
-const items = [
-  ...photoWork,
-  ...videoWork,
-  ...getWork(service.id),
-];
-
-const real = items.filter((i) => !i.status).length;
-  
+  const items = getWork(service.id);
+  const real = items.filter((i) => !i.status).length;
 
   const enquire = `/?service=${encodeURIComponent(service.title)}#contact`;
   const others = services.filter((s) => s.id !== service.id);
