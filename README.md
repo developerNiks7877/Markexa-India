@@ -29,8 +29,12 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy frontend to Render
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This repository includes a `render.yaml` Blueprint for deploying the frontend as a Node web service. In Render, create a **Blueprint** from this repository and deploy `markexaindia-frontend`. Do not deploy it as a static site: the contact form uses the app's `/api/contact` route.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The site works without deploying the separate backend. Backend-powered photos, videos, and portfolio links are skipped unless `NEXT_PUBLIC_API_URL` is configured. The contact form runs in demo mode until these optional Render environment variables are set:
+
+- `RESEND_API_KEY`
+- `CONTACT_TO_EMAIL`
+- `CONTACT_FROM_EMAIL` (a verified Resend sender)

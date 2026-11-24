@@ -1,12 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  experimental: {
-    agentFeedback: true,
-  },
   devIndicators: false,
-  allowedDevOrigins: ["192.168.1.4"],
   images: {
     remotePatterns: [
       {
@@ -14,17 +9,13 @@ const nextConfig: NextConfig = {
         hostname: "res.cloudinary.com",
         pathname: "/ebboxhoj/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
     ],
   },
-  turbopack: {
-    root: process.cwd(),
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
-  },
+  // Turbopack is dev-only; production build uses standard webpack
 };
 
 export default nextConfig;

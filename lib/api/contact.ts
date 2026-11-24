@@ -1,17 +1,15 @@
-import { API_BASE_URL } from "@/lib/api";
-
 export type ContactPayload = {
   name: string;
   email: string;
   company: string;
-  services: string[];   // backend expects an array
+  service: string;
   budget: string;
   message: string;
-  timeline?: string;
+  website: string;
 };
 
 export async function submitContact(data: ContactPayload) {
-  const response = await fetch(`${API_BASE_URL}/api/contact`, {
+  const response = await fetch("/api/contact", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

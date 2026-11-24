@@ -1,4 +1,6 @@
 
+import { API_BASE_URL } from "@/lib/api";
+
 export interface PhotoLink {
   _id: string;
   title: string;
@@ -16,10 +18,10 @@ interface PhotoLinksResponse {
   data: PhotoLink[];
 }
 
-const API_BASE_URL = "https://markexa-backend-mc4v.onrender.com/api";
-
 export async function getPhotoLinks(): Promise<PhotoLink[]> {
-  const url = `${API_BASE_URL}/photos-links`;
+  if (!API_BASE_URL) return [];
+
+  const url = `${API_BASE_URL}/api/photos-links`;
 
   console.log("Photo Links API URL:", url);
 

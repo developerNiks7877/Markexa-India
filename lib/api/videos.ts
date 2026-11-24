@@ -18,6 +18,8 @@ type VideosResponse = {
 };
 
 export async function getVideos(): Promise<Video[]> {
+  if (!API_BASE_URL) return [];
+
   try {
     const response = await fetch(`${API_BASE_URL}/api/videos`, {
       method: "GET",

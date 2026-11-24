@@ -21,6 +21,8 @@ type PhotosResponse = {
 };
 
 export async function getPhotos(): Promise<Photo[]> {
+  if (!API_BASE_URL) return [];
+
   try {
     const response = await fetch(`${API_BASE_URL}/api/photos`, {
       method: "GET",

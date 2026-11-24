@@ -189,9 +189,10 @@ export default function Contact() {
     name: name.trim(),
     email: email.trim(),
     company: company.trim(),
-    services: service ? [service] : [],   // backend expects array
+    service,
     budget,
     message: message.trim(),
+    website,
   });
 
   if (responseData.demo) {
