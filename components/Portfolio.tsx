@@ -42,19 +42,24 @@ export default function Portfolio() {
     s.vel = 0; s.target = -(cur + d) * STEP; kick();
   }, [kick]);
 
+  const step = useCallback((dir: number) => {
+    const s = st.current;
+    s.vel = 0;
+    s.target = Math.round(s.target / STEP) * STEP - dir * STEP;
+    kick();
+  }, [kick]);
 
-useEffect(() => {
-  if (N < 2) return;
+  useEffect(() => {
+    if (N < 2) return;
 
-  const timer = setInterval(() => {
-    if (!isPaused.current && !isManuallySelected.current) {
-      step(1);
-    }
-  }, 1500);
+    const timer = setInterval(() => {
+      if (!isPaused.current && !isManuallySelected.current) {
+        step(1);
+      }
+    }, 1500);
 
-  return () => clearInterval(timer);
-}, []);
-  const step = (dir: number) => { const s = st.current; s.vel = 0; s.target = Math.round(s.target / STEP) * STEP - dir * STEP; kick(); };
+    return () => clearInterval(timer);
+  }, [step]);
 
   useEffect(() => {
     const el = stage.current!;

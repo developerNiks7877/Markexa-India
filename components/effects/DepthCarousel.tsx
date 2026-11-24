@@ -138,7 +138,9 @@ export default function DepthCarousel({
 
   const [active, setActive] = useState(0);
 
-  onChangeRef.current = onChange;
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   // Settings used by the animation
   const configRef = useRef({
@@ -157,7 +159,23 @@ export default function DepthCarousel({
     autoplayDelay,
   });
 
-  configRef.current = {
+  useEffect(() => {
+    configRef.current = {
+      count,
+      depth,
+      spread,
+      tilt,
+      tiltDirection,
+      visibleCards,
+      falloff,
+      blur,
+      duration,
+      ease,
+      loop,
+      cardWidth,
+      autoplayDelay,
+    };
+  }, [
     count,
     depth,
     spread,
@@ -171,7 +189,7 @@ export default function DepthCarousel({
     loop,
     cardWidth,
     autoplayDelay,
-  };
+  ]);
 
   // Position every card in 3D space
   const layout = useCallback((position: number) => {
